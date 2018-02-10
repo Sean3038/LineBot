@@ -17,7 +17,6 @@ app = Flask(__name__)
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
 db.app = app
-db.create_all()
 
 line_bot_api = LineBotApi(
     "ktZx2BhmTCfUsnUjNbgN9rD8Tfj9Q0+Gbg3cVbD4x2BhYNlQEZ5EEBu1wmmtzOhVKYx73k8INzAElVAdDJMyiM9FDaF6"
