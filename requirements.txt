@@ -37,7 +37,6 @@ pycparser==2.18
 PyDispatcher==2.0.5
 pyOpenSSL==17.5.0
 pyparsing==2.2.0
-pypiwin32==220
 python-dateutil==2.6.1
 python-editor==1.0.3
 pytz==2017.3
