@@ -91,9 +91,18 @@ def handle_postback(event):
 
 @handler.add(FollowEvent)
 def handle_FollowEvent(event):
-    reply_text_message(
+    line_bot_api.push_message(
         event.reply_token,
-        '我是Shotic,有任何的問題輸入"Help"我馬上來喔(hahaha)')
+        [
+            StickerSendMessage(
+                package_id='1',
+                sticker_id='2'
+            ),
+            TextSendMessage(
+                text='我是Shotic,有任何的問題輸入"Help"我馬上來喔(hahaha),另外可以輸入"訂閱"早上會有驚喜喔!!,偷偷跟你說我有很多"照片"喔嘿嘿'
+            )
+        ]
+    )
 
 
 def interval_news(event):
