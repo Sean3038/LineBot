@@ -1,0 +1,14 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project filesgit
+.idea
+*.iml
+*.db
+#mycrawltext
+crawltest/
+out
+gen
+index/
+venv/Include/
