@@ -265,7 +265,7 @@ def search(event):
             line_bot_api.push_message(
                 event.source.user_id,
                 messages=message,
-                timeout=20
+                timeout=50
             )
         else:
             line_bot_api.push_message(
