@@ -141,7 +141,7 @@ def lol():
 def search_video(key):
     head='http://www.58b.tv'
     payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
-    rs=requests.get('http://www.58b.tv/index.php',params=payload)
+    rs=requests.get('http://www.58b.tv/index.php',params=payload,timeout=1)
     soup=BeautifulSoup(rs.text,'lxml')
     ary=[]
     for item in soup.findAll("table",attrs={'style':'width:100%;'}):
@@ -149,6 +149,7 @@ def search_video(key):
         i['img']=str.replace(str.replace(item.select_one("img[src]")['src'], 'https', 'http'), 'http', 'https')
         i['url']=head+item.select_one('a')['href']
         i['name']=item.select_one('td h3 a').text
+        print(i)
         ary.append(i)
     return ary
 
