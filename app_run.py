@@ -4,6 +4,7 @@ from database import db
 from models import User, DrawService, Film
 from flask import Flask, request, abort
 from flask_apscheduler import APScheduler
+from flask_sslify import SSLify
 from jobs import Config
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
@@ -18,6 +19,7 @@ import threading
 
 
 app = Flask(__name__)
+sslify = SSLify(app)
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
 db.app = app
