@@ -1,5 +1,5 @@
 from app_run import app, db
-from models import User,Observable
+from models import User
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 

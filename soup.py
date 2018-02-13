@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
 import re
-import json
 import requests
 import random
+from datetime import datetime
 
 domain = 'https://www.ptt.cc'
 
@@ -66,7 +66,7 @@ def draw_beauty():
     rs = requests.get('https://www.ptt.cc/bbs/Beauty/index.html')
     soup = BeautifulSoup(rs.text, 'lxml')
     start_page = get_Current_Page(soup)
-    start_page = random.randrange(1000, start_page - 20)
+    start_page = random.randrange(1500, start_page - 20)
     count = 0
     htmls = []
     ary = []
@@ -95,8 +95,7 @@ def draw_beauty():
                         if rsoup.select_one('a[href*=".jpg"]'):
                             i = dict()
                             i['target'] = domain + item.select_one('a')['href']
-                            i['img'] = str.replace(rsoup.select_one('a[href*=".jpg"]')['href'], 'https', 'http')
-                            i['img'] = str.replace(i['img'], 'http', 'https')
+                            i['img'] = str.replace(str.replace(rsoup.select_one('a[href*=".jpg"]')['href'], 'https', 'http'), 'http', 'https')
                             ary.append(i)
                             count += 1
     return ary.copy()
@@ -139,38 +138,35 @@ def lol():
     return content
 
 
-def search_keyword_pchome(key):
-    print('-------search keyword from pchome------')
-    head='https://a.ecimg.tw/'
-    payloads={
-        'page': 1,
-        'sort': 'rnk/dc'
-    }
-    payloads['q']=key
-    response=requests.get('https://ecshweb.pchome.com.tw/search/v3.3/all/results',payloads)
-    m=BeautifulSoup(response.text,'lxml')
-    print('-------parse data------')
-    result=json.loads(m.text)
-    pl=[]
-    total=len(result['prods'])
-    for id,p in enumerate(result['prods']):
-        item={}
-        item['Id']=p['Id']
-        item['name'] = p['name']
-        item['image'] = head+p['picS']
-        item['describe']=p['describe']
-        item['price'] = p['price']
-        item['originPrice'] = p['originPrice']
-        pl.append(item)
-        print('{0:.0f}%'.format((id+1)/total*100))
-    print('-------parse complete------')
-    print('-------return data--------')
-    return pl
+def search_video(key):
+    head='http://www.58b.tv'
+    payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
+    rs=requests.get('http://www.58b.tv/index.php',params=payload)
+    soup=BeautifulSoup(rs.text,'lxml')
+    ary=[]
+    for item in soup.findAll("table",attrs={'style':'width:100%;'}):
+        i=dict()
+        i['img']=str.replace(str.replace(item.select_one("img[src]")['src'], 'https', 'http'), 'http', 'https')
+        i['url']=head+item.select_one('a')['href']
+        i['name']=item.select_one('td h3 a').text
+        ary.append(i)
+    return ary
 
 
-def search_product_ruten():
-    pass
-
-
-if __name__ == '__main__':
-    print(draw_beauty())
+def search_video_detail(url):
+    result=dict()
+    rs = requests.get(url);
+    soup= BeautifulSoup(rs.text,'lxml')
+    time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
+    m = re.search(r"：(\S+) (\S+)",time_string)
+    fmt='%Y-%m-%d %H:%M:%S'
+    d=datetime.strptime(m.group(1)+" "+m.group(2), fmt)
+    film= soup.find('h2')
+    ep_string=soup.find('div', {'class': 'vshow'}).find(string=re.compile(r"連載")).find_parent().text
+    m = re.search(r"連載：(\S+)", ep_string)
+    ep=m.group(1)
+    result['film']=film.string
+    result['update_time']=d
+    result['episode']=ep
+    result['url']=url
+    return result
