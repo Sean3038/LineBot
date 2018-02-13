@@ -57,8 +57,8 @@ def handle_message(event):
     elif event.message.text == '退訂':
         unsubscribe(event)
     elif re.match(r'^搜尋', event.message.text):
-        threading.Thread(target=search,name='search',args=[event]).start()
         reply_text_message(event.reply_token, '我找找看喔，等我~~~')
+        threading.Thread(target=search,name='search',args=[event]).start()
     elif event.message.text == '追蹤清單':
         reply_text_message(event.reply_token, get_chase_list(event.source.user_id))
     elif re.match(r'^取消',event.message.text):
@@ -70,8 +70,8 @@ def handle_message(event):
     elif event.message.text == '嗨':
         reply_text_message(event.reply_token, '嗨~~')
     elif event.message.text == '照片':
+        reply_text_message(event.reply_token, '等我一下喔，讓我找找')
         threading.Thread(target=draw_image,name='photo_crawl',args=[event]).start()
-        reply_text_message(event.reply_token,'等我一下喔，讓我找找')
     else:
         unsupported_message(event)
 
@@ -245,10 +245,10 @@ def cal_d_count(user):
 
 
 def search(event):
-    m=re.match(r'^搜尋(\w+)',event.message.text)
+    m=re.match(r'^搜尋(\S+)',event.message.text)
     if m:
         ary=search_video(m.group(1))
-        if len(ary) >0:
+        if len(ary) > 0:
             columns=[]
             for i in ary:
                 actions=[
@@ -264,7 +264,8 @@ def search(event):
                 )
             line_bot_api.push_message(
                 event.source.user_id,
-                messages=message
+                messages=message,
+                timeout=20
             )
         else:
             line_bot_api.push_message(
@@ -273,6 +274,13 @@ def search(event):
                     text='抱歉找不到你說的影片'
                 )
             )
+    else:
+        line_bot_api.push_message(
+            event.source.user_id,
+            messages=TextSendMessage(
+                text='請輸入影集名稱'
+            )
+        )
 
 
 def chase_film(user,url):
