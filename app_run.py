@@ -13,7 +13,7 @@ from linebot.models import (
     ConfirmTemplate, FollowEvent, ImageCarouselTemplate, ImageCarouselColumn,ImageSendMessage,
     CarouselTemplate,CarouselColumn
 )
-from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail
+from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
 import threading
 
 
@@ -72,6 +72,8 @@ def handle_message(event):
     elif event.message.text == '照片':
         reply_text_message(event.reply_token, '等我一下喔，讓我找找')
         threading.Thread(target=draw_image,name='photo_crawl',args=[event]).start()
+    elif event.message.text == '測試':
+        reply_text_message(event.reply_token,test_connect())
     else:
         unsupported_message(event)
 
