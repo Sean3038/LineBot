@@ -142,11 +142,14 @@ def search_video(key):
     head='http://www.58b.tv'
     header = {
         'Host': 'www.58b.tv',
-        'User-Agent': 'Mozilla / 5.0(Windows NT 10.0;Win64;x64;rv: 58.0) Gecko / 20100101Firefox / 58.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
         'Upgrade-Insecure-Requests': '1'
     }
+    cookie = {
+        '__cfduid': 'd17006dc624bdaf69011652b2b219dd5e1518540930'
+    }
     payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
-    rs=requests.get('http://www.58b.tv/index.php',params=payload,headers=header)
+    rs=requests.get('http://www.58b.tv/index.php',params=payload,headers=header,cookies=cookie)
     soup=BeautifulSoup(rs.text,'lxml')
     ary=[]
     for item in soup.findAll("table",attrs={'style':'width:100%;'}):
@@ -163,10 +166,13 @@ def search_video_detail(url):
     result=dict()
     header={
         'Host': 'www.58b.tv',
-        'User-Agent': 'Mozilla / 5.0(Windows NT 10.0;Win64;x64;rv: 58.0) Gecko / 20100101Firefox / 58.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
         'Upgrade-Insecure-Requests':'1'
     }
-    rs = requests.get(url,headers=header);
+    cookie = {
+        '__cfduid': 'd17006dc624bdaf69011652b2b219dd5e1518540930'
+    }
+    rs = requests.get(url,headers=header,cookies=cookie);
     soup= BeautifulSoup(rs.text,'lxml')
     time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
     m = re.search(r"：(\S+) (\S+)",time_string)
@@ -187,9 +193,14 @@ def test_connect():
     head = 'http://www.58b.tv'
     header={
         'Host': 'www.58b.tv',
-        'User-Agent': 'Mozilla / 5.0(Windows NT 10.0;Win64;x64;rv: 58.0) Gecko / 20100101Firefox / 58.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
         'Upgrade-Insecure-Requests':'1'
     }
+    cookie={
+        '__cfduid' : 'd17006dc624bdaf69011652b2b219dd5e1518540930'
+    }
     payload = {'s': 'home-Vod-innersearch-q-' + '閃電俠' + '-order-undefined'}
-    rs = requests.get('http://www.58b.tv/index.php', params=payload,headers=header)
+    rs = requests.get('http://www.58b.tv/index.php', params=payload,headers=header,cookies=cookie)
     return str(rs)
+
+print(test_connect())
