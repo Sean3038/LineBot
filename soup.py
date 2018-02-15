@@ -30,7 +30,7 @@ def beauty():
     count = 0
     htmls = []
     ary=[]
-    for page in range(start_page - 10, start_page):
+    for page in range(start_page - 20, start_page):
         htmls.append('https://www.ptt.cc/bbs/Beauty/index{}.html'.format(page))
 
     while htmls:
@@ -141,15 +141,14 @@ def lol():
 def search_video(key):
     head='http://www.58b.tv'
     header = {
-        'Host': 'www.58b.tv',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
-        'Upgrade-Insecure-Requests': '1'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0'
     }
     cookie = {
         '__cfduid': 'd17006dc624bdaf69011652b2b219dd5e1518540930'
     }
     payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
-    rs=requests.get('http://www.58b.tv/index.php',params=payload,headers=header,cookies=cookie)
+    rs = requests.Session()
+    rs=rs.get('http://www.58b.tv/index.php',params=payload,headers=header,cookies=cookie)
     soup=BeautifulSoup(rs.text,'lxml')
     ary=[]
     for item in soup.findAll("table",attrs={'style':'width:100%;'}):
@@ -191,16 +190,22 @@ def search_video_detail(url):
 
 def test_connect():
     head = 'http://www.58b.tv'
-    header={
+    headers = {
         'Host': 'www.58b.tv',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
-        'Upgrade-Insecure-Requests':'1'
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate',
+        'Referer': 'http://www.58b.tv/vod-show-id-3-p-1.html',
     }
     cookie={
         '__cfduid' : 'd17006dc624bdaf69011652b2b219dd5e1518540930'
     }
+    proxies = {
+        "https": "114.42.115.222",
+    }
     payload = {'s': 'home-Vod-innersearch-q-' + '閃電俠' + '-order-undefined'}
-    rs = requests.get('http://www.58b.tv/index.php', params=payload,headers=header,cookies=cookie)
+    rs = requests.get('http://www.58b.tv/index.php', params=payload,headers=headers,cookies=cookie)
     return str(rs)
 
 print(test_connect())

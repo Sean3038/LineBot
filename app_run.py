@@ -365,8 +365,7 @@ def d_service():
             ]
             line_bot_api.push_message(
                 user,
-                messages=messages,
-                timeout=0.001
+                messages=messages
             )
 
 
