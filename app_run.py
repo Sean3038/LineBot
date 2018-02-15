@@ -14,11 +14,13 @@ from linebot.models import (
     ConfirmTemplate, FollowEvent, ImageCarouselTemplate, ImageCarouselColumn,ImageSendMessage,
     CarouselTemplate,CarouselColumn
 )
+from werkzeug.contrib.fixers import ProxyFix
 from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
 import threading
 
 
 app = Flask(__name__)
+app.wsgi_app=ProxyFix(app.wsgi_app)
 sslify = SSLify(app)
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
