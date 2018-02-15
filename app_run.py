@@ -20,11 +20,17 @@ import threading
 
 
 app = Flask(__name__)
-app.wsgi_app=ProxyFix(app.wsgi_app)
+
 sslify = SSLify(app)
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
+app.wsgi_app=ProxyFix(app.wsgi_app)
 db.app = app
+
+if not request.headers.getlist("X-Forwarded-For"):
+   ip = request.remote_addr
+else:
+   ip = request.headers.getlist("X-Forwarded-For")[0]
 
 line_bot_api = LineBotApi(
     "ktZx2BhmTCfUsnUjNbgN9rD8Tfj9Q0+Gbg3cVbD4x2BhYNlQEZ5EEBu1wmmtzOhVKYx73k8INzAElVAdDJMyiM9FDaF6"
