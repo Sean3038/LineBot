@@ -16,6 +16,15 @@ class Config(object):
             'start_date': '2013-02-13 00:00',
             'hour': '*/1'
 
+        },
+        {
+            'id': 'job3',
+            'func': 'app_run:chase_job',
+            'args': '',
+            'trigger': 'cron',
+            'start_date': '2013-02-13 00:00',
+            'minute': '*/1'
+
         }
     ]
 
