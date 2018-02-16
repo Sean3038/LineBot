@@ -19,7 +19,7 @@ class Config(object):
         },
         {
             'id': 'job3',
-            'func': 'app_run:chase_job',
+            'func': 'app_run:d_service',
             'args': '',
             'trigger': 'cron',
             'start_date': '2013-02-13 00:00',
