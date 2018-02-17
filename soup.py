@@ -5,7 +5,9 @@ import random
 from datetime import datetime
 
 domain = 'https://www.ptt.cc'
-
+proxy={
+        'http':'http://61.216.1.23:3128'
+    }
 
 def gossip():
     ans = {'from': '/bbs/Gossiping/index.html', 'yes': 'yes'}
@@ -142,7 +144,7 @@ def search_video(key):
     head='http://www.58b.tv'
     payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
     rs = requests.Session()
-    rs=rs.get('http://www.58b.tv/index.php',params=payload)
+    rs=rs.get('http://www.58b.tv/index.php',params=payload,proxies=proxy)
     soup=BeautifulSoup(rs.text,'lxml')
     ary=[]
     for item in soup.findAll("table",attrs={'style':'width:100%;'}):
@@ -157,7 +159,8 @@ def search_video(key):
 
 def search_video_detail(url):
     result=dict()
-    rs = requests.get(url);
+
+    rs = requests.get(url,proxies=proxy);
     soup= BeautifulSoup(rs.text,'lxml')
     time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
     m = re.search(r"：(\S+) (\S+)",time_string)
@@ -188,7 +191,8 @@ def test_connect():
         '__cfduid' : 'd17006dc624bdaf69011652b2b219dd5e1518540930'
     }
     payload = {'s': 'home-Vod-innersearch-q-' + '閃電俠' + '-order-undefined'}
-    rs = requests.get('http://www.58b.tv/index.php')
+    proxy={
+        'http':'http://61.216.1.23:3128'
+    }
+    rs = requests.get('http://www.58b.tv/index.php',proxies=proxy)
     return str(rs)
-
-print(test_connect())
