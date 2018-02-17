@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import re
 import requests
+from requests.exceptions import Timeout
 import random
 from datetime import datetime
 
@@ -144,36 +145,41 @@ def search_video(key):
     head='http://www.58b.tv'
     payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
     rs = requests.Session()
-    rs=rs.get('http://www.58b.tv/index.php',params=payload,proxies=proxy)
-    soup=BeautifulSoup(rs.text,'lxml')
-    ary=[]
-    for item in soup.findAll("table",attrs={'style':'width:100%;'}):
-        i=dict()
-        i['img']=str.replace(str.replace(item.select_one("img[src]")['src'], 'https', 'http'), 'http', 'https')
-        i['url']=head+item.select_one('a')['href']
-        i['name']=item.select_one('td h3 a').text
-        print(i)
-        ary.append(i)
+    try:
+        rs=rs.get('http://www.58b.tv/index.php',params=payload,proxies=proxy,timeout=30)
+        soup=BeautifulSoup(rs.text,'lxml')
+        ary=[]
+        for item in soup.findAll("table",attrs={'style':'width:100%;'}):
+            i=dict()
+            i['img']=str.replace(str.replace(item.select_one("img[src]")['src'], 'https', 'http'), 'http', 'https')
+            i['url']=head+item.select_one('a')['href']
+            i['name']=item.select_one('td h3 a').text
+            print(i)
+            ary.append(i)
+    except Timeout as e:
+        print(e)
     return ary
 
 
 def search_video_detail(url):
     result=dict()
-
-    rs = requests.get(url,proxies=proxy);
-    soup= BeautifulSoup(rs.text,'lxml')
-    time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
-    m = re.search(r"：(\S+) (\S+)",time_string)
-    fmt='%Y-%m-%d %H:%M:%S'
-    d=datetime.strptime(m.group(1)+" "+m.group(2), fmt)
-    film= soup.find('h2')
-    ep_string=soup.find('div', {'class': 'vshow'}).find(string=re.compile(r"連載")).find_parent().text
-    m = re.search(r"連載：(\S+)", ep_string)
-    ep=m.group(1)
-    result['film']=film.string
-    result['update_time']=d
-    result['episode']=ep
-    result['url']=url
+    try:
+        rs = requests.get(url,proxies=proxy,timeout=20);
+        soup= BeautifulSoup(rs.text,'lxml')
+        time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
+        m = re.search(r"：(\S+) (\S+)",time_string)
+        fmt='%Y-%m-%d %H:%M:%S'
+        d=datetime.strptime(m.group(1)+" "+m.group(2), fmt)
+        film= soup.find('h2')
+        ep_string=soup.find('div', {'class': 'vshow'}).find(string=re.compile(r"連載")).find_parent().text
+        m = re.search(r"連載：(\S+)", ep_string)
+        ep=m.group(1)
+        result['film']=film.string
+        result['update_time']=d
+        result['episode']=ep
+        result['url']=url
+    except Timeout as e:
+        print(e)
     return result
 
 

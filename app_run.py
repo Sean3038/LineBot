@@ -279,7 +279,7 @@ def search(event):
             line_bot_api.push_message(
                 event.source.user_id,
                 messages=TextSendMessage(
-                    text='抱歉找不到你說的影片'
+                    text='抱歉找不到你說的影片，可以再讓我試試看..'
                 )
             )
     else:
@@ -382,16 +382,17 @@ def chase_job():
             db.session.commit()
         else:
             detail=search_video_detail(film.url)
-            if detail['update_time'] > film.update_time:
-                print(film.film+' 更新了')
-                film.film=detail['film']
-                film.episode=detail['episode']
-                film.update_time=detail['update_time']
-                db.session.commit()
-                for user in film.users:
-                    film_update_notify(user.uid,detail)
-            else:
-                print(film.film+' 尚未更新')
+            if detail:
+                if detail['update_time'] > film.update_time:
+                    print(film.film+' 更新了')
+                    film.film=detail['film']
+                    film.episode=detail['episode']
+                    film.update_time=detail['update_time']
+                    db.session.commit()
+                    for user in film.users:
+                        film_update_notify(user.uid,detail)
+                else:
+                    print(film.film+' 尚未更新')
 
 
 def film_update_notify(user,film):
@@ -451,7 +452,8 @@ def unsubscribe(event):
 
 
 if __name__ == "__main__":
-    scheduler = APScheduler(timezone=tz)
+    scheduler = APScheduler()
+    scheduler.scheduler.timezone=tz
     app.config.from_object(Config)
     scheduler.init_app(app)
     scheduler.start()
