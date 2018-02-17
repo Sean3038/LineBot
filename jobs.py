@@ -15,7 +15,6 @@ class Config(object):
             'trigger': 'cron',
             'start_date': '2013-02-13 00:00',
             'hour': '*/1'
-
         }
     ]
 

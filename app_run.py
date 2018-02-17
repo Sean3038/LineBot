@@ -16,11 +16,12 @@ from linebot.models import (
 )
 from safefix import SaferProxyFix
 from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
+import pytz
 import threading
 
 
 app = Flask(__name__)
-
+tz=pytz.timezone('Asia/Taipei')
 sslify = SSLify(app)
 app.config.from_pyfile('config.cfg')
 app.wsgi_app=SaferProxyFix(app.wsgi_app)
@@ -450,7 +451,7 @@ def unsubscribe(event):
 
 
 if __name__ == "__main__":
-    scheduler = APScheduler()
+    scheduler = APScheduler(timezone=tz)
     app.config.from_object(Config)
     scheduler.init_app(app)
     scheduler.start()
