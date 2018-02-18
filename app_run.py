@@ -286,6 +286,13 @@ def search(event):
                     text='抱歉找到睡著，讓我再試一次...'
                 )
             )
+        except ProxyError:
+            line_bot_api.push_message(
+                event.source.user_id,
+                messages=TextSendMessage(
+                    text='抱歉跌倒跟丟了，讓我再試一次...'
+                )
+            )
     else:
         line_bot_api.push_message(
             event.source.user_id,
