@@ -117,8 +117,16 @@ def handle_postback(event):
             )
     elif re.match(r'search',event.postback.data):
         m=re.match(r'search&(\S+)',event.postback.data)
+        reply_text_message(event.reply_token, '請稍後...<3')
         if m:
-            reply_text_message(event.reply_token,chase_film(event.source.user_id,m.group(1)))
+            t=chase_film(event.source.user_id, m.group(1))
+            line_bot_api.push_message(
+                event.source.user_id,
+                messages=TextSendMessage(
+                    text=t
+                )
+            )
+
 
 
 @handler.add(FollowEvent)
