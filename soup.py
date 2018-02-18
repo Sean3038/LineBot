@@ -8,6 +8,7 @@ domain = 'https://www.ptt.cc'
 proxy={
         'http':'http://61.216.1.23:3128'
     }
+requests.adapters.DEFAULT_RETRIES = 5
 
 def gossip():
     ans = {'from': '/bbs/Gossiping/index.html', 'yes': 'yes'}
