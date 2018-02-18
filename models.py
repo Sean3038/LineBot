@@ -38,7 +38,7 @@ class Film(db.Model):
     query = db.session.query_property()
 
     id = db.Column(db.Integer, primary_key=True,autoincrement=True)
-    film = db.Column(db.String(32), nullable=False)
+    film = db.Column(db.String(32), nullable=False,unique=True)
     episode = db.Column(db.String(32))
     update_time = db.Column(db.DateTime,nullable=False)
     url = db.Column(db.String(64),nullable=False)

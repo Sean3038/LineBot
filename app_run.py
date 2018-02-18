@@ -14,6 +14,8 @@ from linebot.models import (
     ConfirmTemplate, FollowEvent, ImageCarouselTemplate, ImageCarouselColumn,ImageSendMessage,
     CarouselTemplate,CarouselColumn
 )
+from requests.exceptions import Timeout
+from sqlalchemy.exc import DBAPIError
 from safefix import SaferProxyFix
 from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
 import pytz
@@ -255,31 +257,39 @@ def cal_d_count(user):
 def search(event):
     m=re.match(r'^搜尋(\S+)',event.message.text)
     if m:
-        ary=search_video(m.group(1))
-        if len(ary) > 0:
-            columns=[]
-            for i in ary:
-                actions=[
-                    PostbackTemplateAction('開始追!!!','search&'+i['url']),
-                    URITemplateAction('讓我看看',i['url'])
-                ]
-                columns.append(CarouselColumn(text=i['name'],thumbnail_image_url=i['img'],actions=actions))
-            message=TemplateSendMessage(
-                    alt_text='playlist',
-                    template=CarouselTemplate(
-                        columns=columns
+        try:
+            ary=search_video(m.group(1))
+            if len(ary) > 0:
+                columns=[]
+                for i in ary:
+                    actions=[
+                        PostbackTemplateAction('開始追!!!','search&'+i['url']),
+                        URITemplateAction('讓我看看',i['url'])
+                    ]
+                    columns.append(CarouselColumn(text=i['name'],thumbnail_image_url=i['img'],actions=actions))
+                message=TemplateSendMessage(
+                        alt_text='playlist',
+                        template=CarouselTemplate(
+                            columns=columns
+                        )
+                    )
+                line_bot_api.push_message(
+                    event.source.user_id,
+                    messages=message,
+                    timeout=50
+                )
+            else:
+                line_bot_api.push_message(
+                    event.source.user_id,
+                    messages=TextSendMessage(
+                        text='抱歉找不到你說的影片'
                     )
                 )
-            line_bot_api.push_message(
-                event.source.user_id,
-                messages=message,
-                timeout=50
-            )
-        else:
+        except Timeout:
             line_bot_api.push_message(
                 event.source.user_id,
                 messages=TextSendMessage(
-                    text='抱歉找不到你說的影片，可以再讓我試試看..'
+                    text='抱歉找到睡著，讓我再試一次...'
                 )
             )
     else:
@@ -316,11 +326,15 @@ def chase_cancel_film(user,fid):
 def check_film(url):
     film=db.session.query(Film).filter(Film.url == url).first()
     if not film:
-        info=search_video_detail(url)
-        n_film=Film(film=info['film'],episode=info['episode'],update_time=info['update_time'],url=info['url'])
-        db.session.add(n_film)
-        db.session.commit()
-        return n_film
+        try:
+            info=search_video_detail(url)
+            n_film=Film(film=info['film'],episode=info['episode'],update_time=info['update_time'],url=info['url'])
+            db.session.add(n_film)
+            db.session.commit()
+            return n_film
+        except DBAPIError as e:
+            print(e)
+            film = db.session.query(Film).filter(Film.url == url).first()
     return film
 
 
@@ -381,18 +395,21 @@ def chase_job():
             db.session.delete(film)
             db.session.commit()
         else:
-            detail=search_video_detail(film.url)
-            if detail:
-                if detail['update_time'] > film.update_time:
-                    print(film.film+' 更新了')
-                    film.film=detail['film']
-                    film.episode=detail['episode']
-                    film.update_time=detail['update_time']
-                    db.session.commit()
-                    for user in film.users:
-                        film_update_notify(user.uid,detail)
-                else:
-                    print(film.film+' 尚未更新')
+            try:
+                detail=search_video_detail(film.url)
+                if detail:
+                    if detail['update_time'] > film.update_time:
+                        print(film.film+' 更新了')
+                        film.film=detail['film']
+                        film.episode=detail['episode']
+                        film.update_time=detail['update_time']
+                        db.session.commit()
+                        for user in film.users:
+                            film_update_notify(user.uid,detail)
+                    else:
+                        print(film.film+' 尚未更新')
+            except Timeout:
+                print('search video detail times out')
 
 
 def film_update_notify(user,film):
