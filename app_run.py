@@ -16,12 +16,10 @@ from linebot.models import (
 from requests.exceptions import Timeout,ConnectionError
 from sqlalchemy.exc import DBAPIError
 from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
-import pytz
 import threading
 
 
 app = Flask(__name__)
-tz=pytz.timezone('Asia/Taipei')
 app.config.from_pyfile('config.cfg')
 db.init_app(app)
 db.app = app
@@ -468,7 +466,6 @@ def unsubscribe(event):
 
 if __name__ == "__main__":
     scheduler = APScheduler()
-    scheduler.scheduler.timezone=tz
     app.config.from_object(Config)
     scheduler.init_app(app)
     scheduler.start()
