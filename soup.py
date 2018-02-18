@@ -142,11 +142,11 @@ def lol():
 
 def search_video(key):
     head='http://www.58b.tv'
-    payload={'s':'home-Vod-innersearch-q-'+key+'-order-undefined'}
+    payload={'s':'home-Vod-innersearch-q-'+key+'-order-2'}
     rs=requests.session()
     rs.keep_alive=False
     ary = []
-    rs=rs.get('http://www.58b.tv/index.php',params=payload,proxies=proxy,timeout=20)
+    rs=rs.get('http://www.58b.tv/index.php',params=payload,proxies=proxy,timeout=30)
     soup=BeautifulSoup(rs.text,'lxml')
     for item in soup.findAll("table",attrs={'style':'width:100%;'}):
         i=dict()
@@ -161,7 +161,7 @@ def search_video_detail(url):
     result=dict()
     rs=requests.session()
     rs.keep_alive=False
-    rs = rs.get(url,proxies=proxy,timeout=20)
+    rs = rs.get(url,proxies=proxy,timeout=30)
     print('find video detail.....')
     soup= BeautifulSoup(rs.text,'lxml')
     time_string=soup.find('div',{'class':'vshow'}).find('p',{'style':"margin-bottom:10px"}).text
