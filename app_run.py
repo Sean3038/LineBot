@@ -61,8 +61,6 @@ def handle_message(event):
     elif re.match(r'^搜尋', event.message.text):
         reply_text_message(event.reply_token, '我找找看喔，等我~~~')
         threading.Thread(target=search,name='search',args=[event]).start()
-    elif event.message.text == '追蹤清單':
-        reply_text_message(event.reply_token, get_chase_list(event.source.user_id))
     elif re.match(r'^取消',event.message.text):
         m=re.match(r'^取消(\d+)',event.message.text)
         if m:
@@ -74,8 +72,6 @@ def handle_message(event):
     elif event.message.text == '照片':
         reply_text_message(event.reply_token, '等我一下喔，讓我找找')
         threading.Thread(target=draw_image,name='photo_crawl',args=[event]).start()
-    elif event.message.text == '測試':
-        reply_text_message(event.reply_token,test_connect())
     else:
         unsupported_message(event)
 
@@ -86,6 +82,10 @@ def handle_postback(event):
         reply_text_message(event.reply_token, gossip())
     elif event.postback.data == 'lol':
         reply_text_message(event.reply_token, lol())
+    elif event.postback.data == 'chaselist':
+        reply_text_message(event.reply_token, get_chase_list(event.source.user_id))
+    elif event.postback.data == 'checkunsub':
+        unsubscribe(event)
     elif re.match(r'unsubscribe',event.postback.data):
         if not check_contract_ds(event.source.user_id):
             line_bot_api.reply_message(
@@ -126,6 +126,8 @@ def handle_postback(event):
                     text=t
                 )
             )
+    elif event.postback.data == 'subscribe':
+        reply_text_message(event.reply_token, subscribe_DService(event))
 
 
 
@@ -170,15 +172,20 @@ def reply_text_message(reply_token, text):
 
 
 def reply_menu_message(event):
+    actions=[
+            URITemplateAction(label='去看看有甚麼想追的', uri='http://mob.58b.tv'),
+            PostbackTemplateAction(label='追蹤清單', data='chaselist')
+        ]
+    i=db.session.query(DrawService).filter(DrawService.uid == event.source.user_id).first()
+    if i.flag:
+        actions.append(PostbackTemplateAction(label='退訂MorningCall'),data='checkunsub')
+    else:
+        actions.append(PostbackTemplateAction(label='訂閱MorningCall..'),data='subscribe')
     template = ButtonsTemplate(
         text='想知道些什麼嗎',
         title='萬能的汪',
         thumbnail_image_url='https://cdn2.ettoday.net/images/2168/2168292.jpg',
-        actions=[
-            PostbackTemplateAction(label='看些有的沒的', data='gossip'),
-            PostbackTemplateAction(label='爛遊戲近況', data='lol'),
-            URITemplateAction(label='去蝦皮晃晃', uri='https://shopee.tw/')
-        ]
+        actions=actions
     )
     message = TemplateSendMessage(
         alt_text='message',
@@ -295,6 +302,13 @@ def search(event):
                 )
             )
         except ProxyError:
+            line_bot_api.push_message(
+                event.source.user_id,
+                messages=TextSendMessage(
+                    text='抱歉跌倒跟丟了，讓我再試一次...'
+                )
+            )
+        except ConnectionError:
             line_bot_api.push_message(
                 event.source.user_id,
                 messages=TextSendMessage(
