@@ -178,9 +178,9 @@ def reply_menu_message(event):
         ]
     i=db.session.query(DrawService).filter(DrawService.uid == event.source.user_id).first()
     if i.flag:
-        actions.append(PostbackTemplateAction(label='退訂MorningCall'),data='checkunsub')
+        actions.append(PostbackTemplateAction(label='退訂MorningCall',data='checkunsub'))
     else:
-        actions.append(PostbackTemplateAction(label='訂閱MorningCall..'),data='subscribe')
+        actions.append(PostbackTemplateAction(label='訂閱MorningCall..',data='subscribe'))
     template = ButtonsTemplate(
         text='想知道些什麼嗎',
         title='萬能的汪',
