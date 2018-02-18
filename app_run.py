@@ -13,7 +13,7 @@ from linebot.models import (
     ConfirmTemplate, FollowEvent, ImageCarouselTemplate, ImageCarouselColumn,ImageSendMessage,
     CarouselTemplate,CarouselColumn
 )
-from requests.exceptions import Timeout,ConnectionError
+from requests.exceptions import Timeout,ConnectionError,ProxyError
 from sqlalchemy.exc import DBAPIError
 from soup import gossip, lol, beauty, draw_beauty, search_video, search_video_detail, test_connect
 import threading
@@ -406,6 +406,8 @@ def chase_job():
                 print('search video detail times out')
             except ConnectionError:
                 print('connect refused')
+            except ProxyError:
+                print('proxy connect fail')
 
 
 def film_update_notify(user,film):
