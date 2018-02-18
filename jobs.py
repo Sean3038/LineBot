@@ -5,7 +5,6 @@ class Config(object):
             'func': 'app_run:d_service',
             'args': '',
             'trigger': 'cron',
-            'start_date': '2013-02-13 00:00',
             'hour': '7'
         },
         {
@@ -13,7 +12,6 @@ class Config(object):
             'func': 'app_run:chase_job',
             'args': '',
             'trigger': 'cron',
-            'start_date': '2013-02-13 00:00',
             'hour': '*/1'
         }
     ]
